@@ -1,1 +1,17 @@
-/target
+# Go
+/portyanka
+/dist/
+coverage.out
+*.test
+*.prof
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

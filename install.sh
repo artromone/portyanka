@@ -1,8 +1,8 @@
 #!/bin/sh
 set -eu
 
-REPO="odysa/portit"
-BIN_NAME="portit"
+REPO="odysa/portyanka"
+BIN_NAME="portyanka"
 
 usage() {
   echo "Usage: install.sh [options]"

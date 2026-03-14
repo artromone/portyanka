@@ -13,37 +13,45 @@ jobs:
     strategy:
       matrix:
         include:
-          - target: x86_64-unknown-linux-gnu
+          - goos: linux
+            goarch: amd64
+            target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
-          - target: x86_64-apple-darwin
-            os: macos-latest
-          - target: aarch64-apple-darwin
-            os: macos-latest
+          - goos: darwin
+            goarch: amd64
+            target: x86_64-apple-darwin
+            os: ubuntu-latest
+          - goos: darwin
+            goarch: arm64
+            target: aarch64-apple-darwin
+            os: ubuntu-latest
+
     runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@nightly
+      - uses: actions/setup-go@v5
         with:
-          targets: ${{ matrix.target }}
-          components: rust-src
+          go-version: '1.23'
+          cache: true
 
       - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
         run: |
-          RUSTFLAGS="-Zunstable-options -Cpanic=immediate-abort" \
-          cargo build --release --target ${{ matrix.target }} \
-            -Z build-std=std,panic_abort
+          go build -ldflags="-s -w" -trimpath -o portyanka .
 
       - name: Package
         run: |
-          cd target/${{ matrix.target }}/release
-          tar czf ../../../portit-${{ matrix.target }}.tar.gz portit
-          cd ../../..
+          tar czf portyanka-${{ matrix.target }}.tar.gz portyanka
 
       - uses: actions/upload-artifact@v4
         with:
-          name: portit-${{ matrix.target }}
-          path: portit-${{ matrix.target }}.tar.gz
+          name: portyanka-${{ matrix.target }}
+          path: portyanka-${{ matrix.target }}.tar.gz
 
   release:
     needs: build
@@ -57,20 +65,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: portit-*.tar.gz
-
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: dtolnay/rust-toolchain@stable
-
-      - name: Publish to crates.io
-        run: cargo publish
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          files: portyanka-*.tar.gz
 
   homebrew:
     needs: release
@@ -83,9 +78,9 @@ jobs:
       - name: Compute SHA256
         id: sha
         run: |
-          echo "aarch64_mac=$(shasum -a 256 portit-aarch64-apple-darwin.tar.gz | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-          echo "x86_64_mac=$(shasum -a 256 portit-x86_64-apple-darwin.tar.gz | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-          echo "x86_64_linux=$(shasum -a 256 portit-x86_64-unknown-linux-gnu.tar.gz | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          echo "aarch64_mac=$(shasum -a 256 portyanka-aarch64-apple-darwin.tar.gz | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          echo "x86_64_mac=$(shasum -a 256 portyanka-x86_64-apple-darwin.tar.gz | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          echo "x86_64_linux=$(shasum -a 256 portyanka-x86_64-unknown-linux-gnu.tar.gz | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
 
       - name: Update Homebrew formula
         uses: actions/checkout@v4
@@ -101,41 +96,41 @@ jobs:
           X="${{ steps.sha.outputs.x86_64_mac }}"
           L="${{ steps.sha.outputs.x86_64_linux }}"
           {
-            echo 'class Portit < Formula'
-            echo '  desc "A minimal TUI for inspecting listening TCP ports and killing processes"'
-            echo '  homepage "https://github.com/odysa/portit"'
+            echo 'class Portyanka < Formula'
+            echo '  desc "A minimal Go TUI for inspecting listening TCP ports and killing processes"'
+            echo '  homepage "https://github.com/odysa/portyanka"'
             echo "  version \"$V\""
             echo '  license "MIT"'
             echo ''
             echo '  on_macos do'
             echo '    on_arm do'
-            echo "      url \"https://github.com/odysa/portit/releases/download/v$V/portit-aarch64-apple-darwin.tar.gz\""
+            echo "      url \"https://github.com/odysa/portyanka/releases/download/v$V/portyanka-aarch64-apple-darwin.tar.gz\""
             echo "      sha256 \"$A\""
             echo '    end'
             echo '    on_intel do'
-            echo "      url \"https://github.com/odysa/portit/releases/download/v$V/portit-x86_64-apple-darwin.tar.gz\""
+            echo "      url \"https://github.com/odysa/portyanka/releases/download/v$V/portyanka-x86_64-apple-darwin.tar.gz\""
             echo "      sha256 \"$X\""
             echo '    end'
             echo '  end'
             echo ''
             echo '  on_linux do'
             echo '    on_intel do'
-            echo "      url \"https://github.com/odysa/portit/releases/download/v$V/portit-x86_64-unknown-linux-gnu.tar.gz\""
+            echo "      url \"https://github.com/odysa/portyanka/releases/download/v$V/portyanka-x86_64-unknown-linux-gnu.tar.gz\""
             echo "      sha256 \"$L\""
             echo '    end'
             echo '  end'
             echo ''
             echo '  def install'
-            echo '    bin.install "portit"'
+            echo '    bin.install "portyanka"'
             echo '  end'
             echo 'end'
-          } > homebrew-tap/Formula/portit.rb
+          } > homebrew-tap/Formula/portyanka.rb
 
       - name: Commit and push
         run: |
           cd homebrew-tap
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Formula/portit.rb
-          git commit -m "Update portit to ${GITHUB_REF_NAME}"
+          git add Formula/portyanka.rb
+          git commit -m "Update portyanka to ${GITHUB_REF_NAME}"
           git push
