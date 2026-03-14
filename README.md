@@ -1,15 +1,9 @@
 portyanka
 =========
 
-[![CI](https://github.com/odysa/portyanka/actions/workflows/ci.yml/badge.svg)](https://github.com/odysa/portyanka/actions/workflows/ci.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/odysa/portyanka)](https://goreportcard.com/report/github.com/odysa/portyanka)
-[![License](https://img.shields.io/github/license/odysa/portyanka)](https://github.com/odysa/portyanka/blob/main/LICENSE)
-
 A minimal Go TUI for inspecting listening TCP ports and killing processes. Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
 
 **Enhanced features:** Sorting, filtering, expandable details with connection counts, and a beautiful TUI powered by Bubble Tea.
-
-![demo](static/demo.gif)
 
 ## Features
 
@@ -26,21 +20,25 @@ A minimal Go TUI for inspecting listening TCP ports and killing processes. Built
 ## Installation
 
 ### Homebrew
+
 ```bash
 brew install odysa/tap/portyanka
 ```
 
 ### Using install script
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/odysa/portyanka/main/install.sh | sh
 ```
 
 ### Using go install
+
 ```bash
 go install github.com/odysa/portyanka@latest
 ```
 
 ### Build from source
+
 ```bash
 git clone https://github.com/odysa/portyanka.git
 cd portyanka
@@ -54,6 +52,7 @@ go build
 ### Keybindings
 
 #### Normal Mode
+
 | Key | Action |
 |-----|--------|
 | `j` / `k` or arrow keys | Move selection up/down |
@@ -69,12 +68,14 @@ go build
 | `q` / `Esc` | Quit |
 
 #### Filter Mode
+
 | Key | Action |
 |-----|--------|
 | `Enter` | Apply filter |
 | `Esc` | Cancel filter |
 
 #### Action Menu & Dialogs
+
 | Key | Action |
 |-----|--------|
 | `j` / `k` or arrow keys | Navigate options |
@@ -86,7 +87,3 @@ go build
 
 - macOS or Linux (x86_64 or aarch64)
 - `lsof` and `kill` in PATH
-
-## License
-
-MIT. See [LICENSE](LICENSE) for details.

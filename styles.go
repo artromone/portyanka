@@ -6,16 +6,16 @@ import (
 
 // Color palette
 const (
-	colorWhite     = lipgloss.Color("15")
-	colorBlue      = lipgloss.Color("12")
-	colorYellow    = lipgloss.Color("11")
-	colorDarkGrey  = lipgloss.Color("8")
-	colorBlack     = lipgloss.Color("0")
-	colorRed       = lipgloss.Color("9")
-	colorDarkRed   = lipgloss.Color("1")
-	colorCyan      = lipgloss.Color("14")
-	colorDarkCyan  = lipgloss.Color("6")
-	colorGreen     = lipgloss.Color("10")
+	colorWhite    = lipgloss.Color("15")
+	colorBlue     = lipgloss.Color("12")
+	colorYellow   = lipgloss.Color("11")
+	colorDarkGrey = lipgloss.Color("8")
+	colorBlack    = lipgloss.Color("0")
+	colorRed      = lipgloss.Color("9")
+	colorDarkRed  = lipgloss.Color("1")
+	colorCyan     = lipgloss.Color("14")
+	colorDarkCyan = lipgloss.Color("6")
+	colorGreen    = lipgloss.Color("10")
 )
 
 // Column widths (characters)
@@ -26,7 +26,7 @@ const (
 	addrWidth    = 18
 	portWidth    = 6
 	// Command column width is calculated dynamically based on terminal width
-	fixedWidth   = pidWidth + processWidth + protoWidth + addrWidth + portWidth + 10 // +10 for separators
+	fixedWidth = pidWidth + processWidth + protoWidth + addrWidth + portWidth + 10 // +10 for separators
 )
 
 // Styles for different UI components
@@ -100,7 +100,7 @@ func padRight(s string, width int) string {
 	if len(s) >= width {
 		return truncate(s, width)
 	}
-	return s + lipgloss.NewStyle().Width(width - len(s)).Render("")
+	return s + lipgloss.NewStyle().Width(width-len(s)).Render("")
 }
 
 // centerText centers text within the specified width
